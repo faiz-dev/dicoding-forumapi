@@ -4,8 +4,7 @@ describe('an CreatedThread Entity', () => {
     it('should throw error when payload did not contain needed property', () => {
         // Arrange
         const payload = {
-            id: 'thread-123',
-            title: ''
+            id: 'thread-123'
         }
 
         // Action & Assert
@@ -18,7 +17,7 @@ describe('an CreatedThread Entity', () => {
         // Arrange
         const payload = {
             id: 'thread-123',
-            title: true,
+            content: true,
             owner: 'user-DWrT3pXe1hccYkV1eIAxS'
         }
 
@@ -32,7 +31,7 @@ describe('an CreatedThread Entity', () => {
         // Arrange
         const payload = {
             id: 'thread-123',
-            title: 'RPL Kandeman',
+            content: 'RPL Kandeman',
             owner: 'user-DWrT3pXe1hccYkV1eIAxS'
         }
 
@@ -41,7 +40,7 @@ describe('an CreatedThread Entity', () => {
 
         // Assert
         expect(createdThread.id).toEqual(payload.id)
-        expect(createdThread.title).toEqual(payload.title)
+        expect(createdThread.content).toEqual(payload.content)
         expect(createdThread.owner).toEqual(payload.owner)
     })
 })

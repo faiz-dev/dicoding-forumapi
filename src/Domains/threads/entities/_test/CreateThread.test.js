@@ -4,7 +4,8 @@ describe('an CreateThread Entity', () => {
     it('should throw error when payload did not contain needed property', () => {
         // Arrange
         const payload = {
-            title: ''
+            content: '',
+            owner: 'user-123'
         }
 
         // Action & Assert
@@ -16,7 +17,7 @@ describe('an CreateThread Entity', () => {
     it('should throw error when payload did not meet data type specification', () => {
         // Arrange
         const payload = {
-            title: true,
+            content: true,
             owner: 'user-DWrT3pXe1hccYkV1eIAxS'
         }
 
@@ -29,13 +30,14 @@ describe('an CreateThread Entity', () => {
     it('should create thread correctly', async () => {
         // Arrange
         const payload = {
-            title: 'RPL SMK Kandeman'
+            content: 'RPL SMK Kandeman',
+            owner: 'user-123'
         }
 
         // Action
         const createThread = new CreateThread(payload)
 
         // Assert
-        expect(createThread.title).toEqual(payload.title)
+        expect(createThread.content).toEqual(payload.content)
     })
 })
