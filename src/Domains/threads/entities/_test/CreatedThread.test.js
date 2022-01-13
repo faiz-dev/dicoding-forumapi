@@ -17,7 +17,8 @@ describe('an CreatedThread Entity', () => {
         // Arrange
         const payload = {
             id: 'thread-123',
-            content: true,
+            title: true,
+            body: 'body thread',
             owner: 'user-DWrT3pXe1hccYkV1eIAxS'
         }
 
@@ -31,7 +32,8 @@ describe('an CreatedThread Entity', () => {
         // Arrange
         const payload = {
             id: 'thread-123',
-            content: 'RPL Kandeman',
+            title: 'RPL Kandeman',
+            body: 'body thread',
             owner: 'user-DWrT3pXe1hccYkV1eIAxS'
         }
 
@@ -40,7 +42,8 @@ describe('an CreatedThread Entity', () => {
 
         // Assert
         expect(createdThread.id).toEqual(payload.id)
-        expect(createdThread.content).toEqual(payload.content)
+        expect(createdThread.title).toEqual(payload.title)
+        expect(createdThread.body).toEqual(payload.body)
         expect(createdThread.owner).toEqual(payload.owner)
     })
 })

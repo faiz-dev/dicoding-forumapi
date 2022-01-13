@@ -6,7 +6,9 @@ class AddThreadUseCase {
     }
 
     async execute (useCasePayload) {
+        console.log('ex: ', useCasePayload)
         const createThread = new CreateThread(useCasePayload)
+        console.log('ct', createThread)
         return this._threadRepository.addThread(createThread)
     }
 }

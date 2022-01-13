@@ -8,13 +8,15 @@ describe('AddThreaduseCase', () => {
     it('should orchestrating the add user action correctly', async () => {
         // Arrange
         const useCasePayload = {
-            content: 'New Thread',
+            title: 'New Thread',
+            body: 'body New Thread',
             owner: 'user-123'
         }
 
         const expectedCreatedThread = new CreatedThreads({
             id: 'thread-123',
-            content: useCasePayload.content,
+            title: useCasePayload.title,
+            body: useCasePayload.body,
             owner: useCasePayload.owner
         })
 
@@ -34,7 +36,8 @@ describe('AddThreaduseCase', () => {
         // Assert
         expect(createdThread).toStrictEqual(expectedCreatedThread)
         expect(mockThreadRepository.addThread).toBeCalledWith(new CreateThread({
-            content: useCasePayload.content,
+            title: useCasePayload.title,
+            body: useCasePayload.body,
             owner: useCasePayload.owner
         }))
     })

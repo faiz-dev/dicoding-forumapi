@@ -1,19 +1,20 @@
 class CreateThread {
     constructor (payload) {
-        const { content, owner } = payload
+        const { title, body, owner } = payload
 
         this._verifyPayload(payload)
 
-        this.content = content
+        this.title = title
+        this.body = body
         this.owner = owner
     }
 
-    _verifyPayload ({ content, owner }) {
-        if (!content || !owner) {
+    _verifyPayload ({ title, body, owner }) {
+        if (!title || !body || !owner) {
             throw new Error('CREATE_THREADS.NOT_CONTAIN_NEEDED_PROPERTY')
         }
 
-        if (typeof content !== 'string' || typeof owner !== 'string') {
+        if (typeof title !== 'string' || typeof body !== 'string' || typeof owner !== 'string') {
             throw new Error('CREATE_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION')
         }
     }

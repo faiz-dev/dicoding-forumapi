@@ -3,6 +3,7 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const CreateThread = require('../../../Domains/threads/entities/CreateThread')
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgress')
 const pool = require('../../database/postgres/pool')
+const CreatedThreads = require( '../../../Domains/threads/entities/CreatedThread' )
 
 describe('ThreadRepositoryPostgres', () => {
     afterEach(async () => {
@@ -16,11 +17,11 @@ describe('ThreadRepositoryPostgres', () => {
 
     describe('Add Thread function', () => {
         it('should presist add thread', async () => {
-            console.log('init presists')
             // Arrange
             await UsersTableTestHelper.addUser({})
             const createThread = new CreateThread({
-                content: 'dicoding',
+                title: 'dicoding',
+                body: 'Thread dicoding',
                 owner: 'user-123'
             })
 
@@ -35,25 +36,27 @@ describe('ThreadRepositoryPostgres', () => {
             expect(thread).toHaveLength(1)
         })
 
-        // it('should return created thread correctly', async () => {
-        //     // Arrange
-        //     await UsersTableTestHelper.addUser({})
-        //     const createThread = new CreateThread({
-        //         content: 'dicoding',
-        //         owner: 'user-123'
-        //     })
-        //     const fakeIdGenerator = () => '123'
-        //     const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator)
+        it('should return created thread correctly', async () => {
+            // Arrange
+            await UsersTableTestHelper.addUser({})
+            const createThread = new CreateThread({
+                title: 'dicoding',
+                body: 'Thread dicoding',
+                owner: 'user-123'
+            })
+            const fakeIdGenerator = () => '123'
+            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator)
 
-        //     // Action
-        //     const createdRepository = await threadRepositoryPostgres.addThread(createThread)
+            // Action
+            const createdRepository = await threadRepositoryPostgres.addThread(createThread)
 
-        //     // Assert
-        //     expect(createdRepository).toStrictEqual(new CreatedThreads({
-        //         id: 'thread-123',
-        //         content: createThread.content,
-        //         owner: createThread.owner
-        //     }))
-        // })
+            // Assert
+            expect(createdRepository).toStrictEqual(new CreatedThreads({
+                id: 'thread-123',
+                title: createThread.title,
+                body: createThread.body,
+                owner: createThread.owner
+            }))
+        })
     })
 })

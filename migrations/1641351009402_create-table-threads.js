@@ -1,28 +1,35 @@
 /* eslint-disable camelcase */
 
 exports.up = (pgm) => {
-    pgm.createTable("threads", {
+    pgm.createTable('threads', {
         id: {
-            type: "VARCHAR(50)",
-            primaryKey: true,
+            type: 'VARCHAR(50)',
+            primaryKey: true
         },
-        content: {
-            type: "TEXT",
-            notNull: true,
+        title: {
+            type: 'TEXT',
+            notNull: true
+        },
+        body: {
+            type: 'TEXT',
+            notNull: true
         },
         owner: {
-            type: "VARCHAR(50)",
-            notNull: true,
+            type: 'VARCHAR(50)',
+            notNull: true
+        },
+        created_at: {
+            type: 'VARCHAR(20)'
         }
     })
 
     pgm.addConstraint(
-        "threads",
-        "fk_threads.owner_users.id",
-        "FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE"
-    );
-};
+        'threads',
+        'fk_threads.owner_users.id',
+        'FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE'
+    )
+}
 
 exports.down = (pgm) => {
-    pgm.dropTable("threads");
-};
+    pgm.dropTable('threads')
+}
