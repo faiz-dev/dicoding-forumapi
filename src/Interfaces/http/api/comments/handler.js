@@ -10,10 +10,12 @@ class CommentHandler {
 
     async postCommentHandler (req, h) {
         const commentUseCase = this._container.getInstance(CommentUseCase.name)
+        const { id: credentialId } = req.auth.credentials
 
-        const addedComment = commentUseCase.addComment({
+        const addedComment = await commentUseCase.addComment({
             threadId: req.params.threadId,
-            ...req.payload
+            ...req.payload,
+            createdBy: credentialId
         })
 
         const response = h.response({
@@ -29,18 +31,18 @@ class CommentHandler {
 
     async deleteCommentHandler (req, h) {
         const { threadId, commentId } = req.params
-        const { createdBy } = req.payload
+        const { id: credentialId } = req.auth.credentials
         const commentUseCase = this._container.getInstance(CommentUseCase.name)
 
-        commentUseCase.deleteComment({
-            threadId, commentId, createdBy
+        await commentUseCase.deleteComment({
+            threadId, commentId, createdBy: credentialId
         })
 
         const response = h.response({
             status: 'success'
         })
 
-        response.code(201)
+        response.code(200)
         return response
     }
 }

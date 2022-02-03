@@ -7,7 +7,7 @@ class CreatedComment {
         this.content = content
         this.createdAt = createdAt
         this.threadId = threadId
-        this.createdBy = createdBy
+        this.owner = createdBy
     }
 
     _verifyPayload ({ id, content, createdAt, threadId, createdBy }) {

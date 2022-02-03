@@ -32,6 +32,16 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     }
 
+    async getCommentsByThreadId (threadId) {
+        const query = {
+            text: 'SELECT comments.*, users.username FROM comments LEFT JOIN users ON comments.created_by=users.id WHERE thread_id=$1',
+            values: [threadId]
+        }
+
+        const result = await this._pool.query(query)
+        return result.rows
+    }
+
     async verifyCommentOwner (id, createdBy) {
         const query = {
             text: 'SELECT created_by FROM comments WHERE id=$1',
@@ -43,7 +53,7 @@ class CommentRepositoryPostgres extends CommentRepository {
         if (result.rowCount === 0) {
             throw new Error('COMMENT_REPOSITORY.COMMENT_NOT_FOUND')
         }
-
+        console.log(result.rows[0], createdBy)
         if (result.rows[0].created_by !== createdBy) {
             throw new Error('COMMENT_REPOSITORY.USER_NOT_COMMENTS_OWNER')
         }
