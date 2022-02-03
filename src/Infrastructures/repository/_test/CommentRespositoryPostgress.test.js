@@ -1,10 +1,9 @@
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper')
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper')
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
-const CreateComment = require('../../../Domains/comments/entities/CreateComment')
 const CreatedComment = require('../../../Domains/comments/entities/CreatedComment')
 const pool = require('../../database/postgres/pool')
-const CommentRepositoryPostgres = require('../ComentRespositoryPostgress')
+const CommentRepositoryPostgres = require('../CommentRespositoryPostgress')
 
 describe('CommentRepositoryPostgres', () => {
     afterEach(async () => {
@@ -21,20 +20,22 @@ describe('CommentRepositoryPostgres', () => {
             // arrange
             const addUser = await UsersTableTestHelper.addUser({})
             const addThread = await ThreadsTableTestHelper.addThread({ owner: addUser.id })
-            const createComment = new CreateComment({
+            const createComment = {
                 content: 'comment 1',
                 threadId: addThread.id,
                 createdBy: addUser.id
-            })
+            }
 
             const fakeIdGenerator = () => '123'
-            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator)
+            const fakeTimeSetter = () => 123
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
 
             // Action
             await commentRepositoryPostgres.addComment(createComment)
 
             // Assert
             const comment = await CommentsTableTestHelper.findCommentById('comment-123')
+            console.log('INSERTED COMMENT: ', comment)
             expect(comment).toHaveLength(1)
         })
 
@@ -42,24 +43,27 @@ describe('CommentRepositoryPostgres', () => {
             // Arrange
             const addUser = await UsersTableTestHelper.addUser({})
             const addThread = await ThreadsTableTestHelper.addThread({ owner: addUser.id })
-            const createComment = new CreateComment({
+            const createComment = {
                 content: 'comment 1',
                 threadId: addThread.id,
                 createdBy: addUser.id
-            })
+            }
 
             const fakeIdGenerator = () => '123'
-            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator)
+            const fakeTimeSetter = () => 123
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
 
             // Action
             const createdComment = await commentRepositoryPostgres.addComment(createComment)
 
             // Assert
-            expect(createdComment).toBeInstanceOf(CreatedComment)
-            expect(createdComment.id).toEqual('comment-123')
-            expect(createdComment.content).toEqual(createComment.content)
-            expect(createdComment.threadId).toEqual(createComment.threadId)
-            expect(createdComment.createdBy).toEqual(createComment.createdBy)
+            expect(createdComment).toStrictEqual(new CreatedComment({
+                id: 'comment-123',
+                content: createComment.content,
+                threadId: createComment.threadId,
+                createdBy: createComment.createdBy,
+                createdAt: fakeTimeSetter() + ''
+            }))
         })
     })
 })

@@ -3,7 +3,7 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const CreateThread = require('../../../Domains/threads/entities/CreateThread')
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgress')
 const pool = require('../../database/postgres/pool')
-const CreatedThreads = require( '../../../Domains/threads/entities/CreatedThread' )
+const CreatedThreads = require('../../../Domains/threads/entities/CreatedThread')
 
 describe('ThreadRepositoryPostgres', () => {
     afterEach(async () => {

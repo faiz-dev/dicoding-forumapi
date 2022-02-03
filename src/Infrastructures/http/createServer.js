@@ -3,12 +3,36 @@ const ClientError = require('../../Commons/exceptions/ClientError')
 const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator')
 const users = require('../../Interfaces/http/api/users')
 const authentications = require('../../Interfaces/http/api/authentications')
-const threads = require( '../../Interfaces/http/api/threads' )
+const threads = require('../../Interfaces/http/api/threads')
+const comments = require('../../Interfaces/http/api/comments')
+const Jwt = require('@hapi/jwt')
 
 const createServer = async (container) => {
     const server = Hapi.server({
         host: process.env.HOST,
         port: process.env.PORT
+    })
+
+    await server.register([
+        {
+            plugin: Jwt
+        }
+    ])
+
+    server.auth.strategy('forumapi_jwt', 'jwt', {
+        keys: process.env.ACCESS_TOKEN_KEY,
+        verify: {
+            aud: false,
+            iss: false,
+            sub: false,
+            maxAgeSec: process.env.ACCESS_TOKEN_AGE
+        },
+        validate: (artifacts) => ({
+            isValid: true,
+            credentials: {
+                id: artifacts.decoded.payload.id
+            }
+        })
     })
 
     await server.register([
@@ -22,6 +46,10 @@ const createServer = async (container) => {
         },
         {
             plugin: threads,
+            options: { container }
+        },
+        {
+            plugin: comments,
             options: { container }
         }
     ])
@@ -50,6 +78,7 @@ const createServer = async (container) => {
             }
 
             // penanganan server error sesuai kebutuhan
+            console.log(response)
             const newResponse = h.response({
                 status: 'error',
                 message: 'terjadi kegagalan pada server kami'

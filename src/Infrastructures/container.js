@@ -26,6 +26,9 @@ const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAu
 const ThreadRepository = require('../Domains/threads/ThreadRepository')
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgress')
 const AddThreadUseCase = require('../Applications/use_case/AddThreadUseCase')
+const CommentRepositoryPostgres = require('./repository/CommentRespositoryPostgress')
+const CommentRepository = require('../Domains/comments/CommentRepository')
+const CommentUseCase = require('../Applications/use_case/CommentUseCase')
 
 // creating container
 const container = createContainer()
@@ -67,6 +70,23 @@ container.register([
                 },
                 {
                     concrete: nanoid
+                }
+            ]
+        }
+    },
+    {
+        key: CommentRepository.name,
+        Class: CommentRepositoryPostgres,
+        parameter: {
+            dependencies: [
+                {
+                    concrete: pool
+                },
+                {
+                    concrete: nanoid
+                },
+                {
+                    concrete: () => new Date().getTime()
                 }
             ]
         }
@@ -175,6 +195,23 @@ container.register([
         parameter: {
             injectType: 'destructuring',
             dependencies: [
+                {
+                    name: 'threadRepository',
+                    internal: ThreadRepository.name
+                }
+            ]
+        }
+    },
+    {
+        key: CommentUseCase.name,
+        Class: CommentUseCase,
+        parameter: {
+            injectType: 'destructuring',
+            dependencies: [
+                {
+                    name: 'commentRepository',
+                    internal: CommentRepository.name
+                },
                 {
                     name: 'threadRepository',
                     internal: ThreadRepository.name
