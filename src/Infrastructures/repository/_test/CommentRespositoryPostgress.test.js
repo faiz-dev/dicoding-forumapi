@@ -35,7 +35,6 @@ describe('CommentRepositoryPostgres', () => {
 
             // Assert
             const comment = await CommentsTableTestHelper.findCommentById('comment-123')
-            console.log('INSERTED COMMENT: ', comment)
             expect(comment).toHaveLength(1)
         })
 
@@ -64,6 +63,100 @@ describe('CommentRepositoryPostgres', () => {
                 createdBy: createComment.createdBy,
                 createdAt: fakeTimeSetter() + ''
             }))
+        })
+    })
+
+    describe('getCommentsByThreadId ', () => {
+        it('should return empty array when comment not found', async () => {
+            const fakeIdGenerator = () => '123'
+            const fakeTimeSetter = () => ''
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
+
+            // Action
+            const comments = await commentRepositoryPostgres.getCommentsByThreadId('th-111')
+
+            // Action & Assert
+            expect(comments).toHaveLength(0)
+        })
+
+        it('should return correct comment when id given', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+            await CommentsTableTestHelper.addComment({})
+
+            const fakeIdGenerator = () => '123'
+            const fakeTimeSetter = () => ''
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
+
+            // Action
+            const comments = await commentRepositoryPostgres.getCommentsByThreadId('thread-123')
+
+            // Assert
+            expect(comments).toHaveLength(1)
+            expect(comments[0].id).toEqual('comment-123')
+            expect(comments[0].content).toEqual('dicoding')
+            expect(comments[0].thread_id).toEqual('thread-123')
+            expect(comments[0].created_by).toEqual('user-123')
+            expect(comments[0].deleted).toEqual(null)
+        })
+    })
+
+    describe('verifyCommentOwner', () => {
+        it('should throw error when comment not found', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+            await CommentsTableTestHelper.addComment({})
+
+            const fakeIdGenerator = () => '123'
+            const fakeTimeSetter = () => ''
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
+
+            // Action & Assert
+            expect(() => commentRepositoryPostgres.verifyCommentOwner('comment-1234', 'user-123')).rejects.toThrowError('COMMENT_REPOSITORY.COMMENT_NOT_FOUND')
+        })
+
+        it('should throw error when owner is not valid', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+            await CommentsTableTestHelper.addComment({})
+
+            const fakeIdGenerator = () => '123'
+            const fakeTimeSetter = () => ''
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
+
+            // Action & Assert
+            expect(() => commentRepositoryPostgres.verifyCommentOwner('comment-123', 'user-14')).rejects.toThrowError('COMMENT_REPOSITORY.USER_NOT_COMMENTS_OWNER')
+        })
+
+        it('should not throw error when owner is valid', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+            await CommentsTableTestHelper.addComment({})
+
+            const fakeIdGenerator = () => '123'
+            const fakeTimeSetter = () => ''
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
+
+            // Action & Assert
+            expect(async () => await commentRepositoryPostgres.verifyCommentOwner('comment-123', 'user-123')).not.toThrow(Error)
+        })
+    })
+
+    describe('deleteComment', () => {
+        it('should change comment content when deleted', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+            await CommentsTableTestHelper.addComment({})
+
+            const fakeIdGenerator = () => '123'
+            const fakeTimeSetter = () => ''
+            const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator, fakeTimeSetter)
+
+            // Action
+            await commentRepositoryPostgres.deleteComment('comment-123')
+            const comment = await CommentsTableTestHelper.findCommentById('comment-123')
+            // Action & Assert
+            expect(comment[0].deleted).toEqual(true)
         })
     })
 })

@@ -3,26 +3,32 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
 const container = require('../../container')
 const pool = require('../../database/postgres/pool')
+const JwtTokenManager = require('../../security/JwtTokenManager')
 const createServer = require('../createServer')
+const Jwt = require('@hapi/jwt')
 
 describe('/thread endpoint', () => {
+    let token = ''
+    beforeAll(async () => {
+        await UsersTableTestHelper.cleanTable()
+        await UsersTableTestHelper.addUser({})
+        const tokenManager = new JwtTokenManager(Jwt.token)
+        token = await tokenManager.createAccessToken({ username: 'user-123', id: 'user-123' })
+    })
     afterAll(async () => {
+        await UsersTableTestHelper.cleanTable()
         await pool.end()
     })
 
     afterEach(async () => {
-        await UsersTableTestHelper.cleanTable()
         await ThreadsTableTestHelper.cleanTable()
     })
 
     describe('when POST /threads', () => {
         it('should response 201 and presisted thread', async () => {
-            await UsersTableTestHelper.addUser({})
-
             const requestPayload = {
                 title: 'Dicoding Indoneisa',
-                body: 'Body Dicoding Indonesia',
-                owner: 'user-123'
+                body: 'Body Dicoding Indonesia'
             }
 
             const server = await createServer(container)
@@ -31,7 +37,10 @@ describe('/thread endpoint', () => {
             const response = await server.inject({
                 method: 'POST',
                 url: '/threads',
-                payload: requestPayload
+                payload: requestPayload,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             })
 
             // Assert
@@ -44,7 +53,6 @@ describe('/thread endpoint', () => {
 
     describe('when GET /threads', () => {
         it('should response 200 and return thread detail', async () => {
-            await UsersTableTestHelper.addUser({})
             const thread = await ThreadsTableTestHelper.addThread({})
             await CommentsTableTestHelper.addComment({})
 

@@ -26,7 +26,8 @@ describe('ThreadRepositoryPostgres', () => {
             })
 
             const fakeIdGenerator = () => '123'
-            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator)
+            const timeSetter = () => new Date().getTime()
+            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator, timeSetter)
 
             // Action
             await threadRepositoryPostgres.addThread(createThread)
@@ -45,7 +46,8 @@ describe('ThreadRepositoryPostgres', () => {
                 owner: 'user-123'
             })
             const fakeIdGenerator = () => '123'
-            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator)
+            const timeSetter = () => new Date().getTime()
+            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator, timeSetter)
 
             // Action
             const createdRepository = await threadRepositoryPostgres.addThread(createThread)
@@ -57,6 +59,50 @@ describe('ThreadRepositoryPostgres', () => {
                 body: createThread.body,
                 owner: createThread.owner
             }))
+        })
+    })
+
+    describe('verifyThreadAvailability', () => {
+        it('throw error when thread not found', async () => {
+            const fakeIdGenerator = () => '123'
+            const timeSetter = () => new Date().getTime()
+            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator, timeSetter)
+
+            // Action
+            expect(async () => await threadRepositoryPostgres.verifyThreadAvailability('no-id')).rejects.toThrowError('THREAD_REPOSITORY.THREAD_NOT_FOUND')
+        })
+
+        it('should not throw error when thread found', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+
+            const fakeIdGenerator = () => '123'
+            const timeSetter = () => new Date().getTime()
+            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator, timeSetter)
+
+            // Action
+            expect(async () => await threadRepositoryPostgres.verifyThreadAvailability('thread-123')).not.toThrow(Error)
+        })
+    })
+
+    describe('getThreadById', () => {
+        it('return correct data object when thread found', async () => {
+            await UsersTableTestHelper.addUser({})
+            await ThreadsTableTestHelper.addThread({})
+
+            const fakeIdGenerator = () => '123'
+            const timeSetter = () => new Date().getTime()
+            const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator, timeSetter)
+            const thread = await threadRepositoryPostgres.getThreadById('thread-123')
+
+            // Action
+            expect(thread).toBeInstanceOf(Object)
+            expect(thread.id).toEqual('thread-123')
+            expect(thread.title).toEqual('dicoding')
+            expect(thread.body).toEqual('dicoding')
+            expect(thread.owner).toEqual('user-123')
+            expect(thread.created_at).toEqual('1644888695373')
+            expect(thread.username).toEqual('dicoding')
         })
     })
 })

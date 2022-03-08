@@ -4,7 +4,6 @@ const AuthorizationError = require('./AuthorizationError')
 
 const DomainErrorTranslator = {
     translate (error) {
-        console.log('translating error')
         return DomainErrorTranslator._directories[error.message] || error
     }
 }

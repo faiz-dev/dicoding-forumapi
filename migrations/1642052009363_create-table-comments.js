@@ -17,6 +17,9 @@ exports.up = pgm => {
         },
         created_at: {
             type: 'VARCHAR(20)'
+        },
+        deleted: {
+            type: 'BOOLEAN'
         }
     })
     pgm.addConstraint(

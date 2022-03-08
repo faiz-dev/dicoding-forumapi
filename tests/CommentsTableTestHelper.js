@@ -7,7 +7,7 @@ const CommentsTableTestHelper = {
         content = 'dicoding',
         threadId = 'thread-123',
         createdBy = 'user-123',
-        createdAt = new Date().getTime()
+        createdAt = '1644888695373'
     }) {
         const query = {
             text: 'INSERT INTO comments (id, content, thread_id, created_by, created_at)VALUES($1, $2, $3, $4, $5) RETURNING id',
@@ -26,7 +26,6 @@ const CommentsTableTestHelper = {
         }
 
         const result = await pool.query(query)
-        console.log('RR', result.rows)
         return result.rows
     },
 

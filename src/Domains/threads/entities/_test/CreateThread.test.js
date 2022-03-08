@@ -10,7 +10,7 @@ describe('an CreateThread Entity', () => {
 
         // Action & Assert
         expect(() => new CreateThread(payload)).toThrowError(
-            'CREATE_THREADS.NOT_CONTAIN_NEEDED_PROPERTY'
+            'CREATE_THREAD.NOT_CONTAIN_NEEDED_PROPERTY'
         )
     })
 
@@ -40,6 +40,8 @@ describe('an CreateThread Entity', () => {
         const createThread = new CreateThread(payload)
 
         // Assert
-        expect(createThread.content).toEqual(payload.content)
+        expect(createThread.title).toEqual('Thread RPL SMK Kandeman')
+        expect(createThread.body).toEqual('Body of thread')
+        expect(createThread.owner).toEqual('user-123')
     })
 })

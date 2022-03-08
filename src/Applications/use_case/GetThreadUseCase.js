@@ -6,23 +6,22 @@ class GetThreadUseCase {
     }
 
     async execute (threadId) {
+        await this._threadRepository.verifyThreadAvailability(threadId)
         const thread = await this._threadRepository.getThreadById(threadId)
-        console.log(thread)
         const comments = await this._commentRepository.getCommentsByThreadId(threadId)
-        const ret = {
+        return {
             id: thread.id,
             title: thread.title,
             body: thread.body,
-            date: thread.created_at ? new Date(thread.created_at * 1000).toISOString() : '',
+            date: new Date(thread.created_at * 1000).toISOString(),
             username: thread.username,
             comments: comments.map(c => ({
                 id: c.id,
                 username: c.username,
-                date: c.created_at ? new Date(c.created_at * 1000).toISOString() : '',
-                content: c.content
+                date: new Date(c.created_at * 1000).toISOString(),
+                content: c.deleted ? '**komentar telah dihapus**' : c.content
             }))
         }
-        return ret
     }
 }
 
